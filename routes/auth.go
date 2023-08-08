@@ -4,12 +4,14 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"todolist/authentication"
 	"todolist/database"
 
+	"github.com/jackc/pgx/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -42,14 +44,7 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 		var err error
 
 		var loginRequest loginRequestForm
-		// loginHeader := []byte(r.Header.Get("todo-list-auth"))
-		fmt.Printf("%+v\n", r.Header)
-		// loginHeader, err := base64.StdEncoding.DecodeString(r.Header.Get("todo-list-auth"))
-		// if err != nil {
-		// 	w.WriteHeader(400)
-		// 	w.Write([]byte(fmt.Sprintf("Error: %v\n", err)))
-		// 	return
-		// }
+
 		err = json.NewDecoder(r.Body).Decode(&loginRequest)
 		if err != nil {
 			w.WriteHeader(400)
@@ -62,7 +57,17 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 		`, loginRequest.Username)
 
 		var passwordHash, hashedSalt string
-		row.Scan(&passwordHash, &hashedSalt)
+		err = row.Scan(&passwordHash, &hashedSalt)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				w.WriteHeader(400)
+				w.Write([]byte("Invalid username or password"))
+				return
+			}
+			w.WriteHeader(400)
+			w.Write([]byte(fmt.Sprintf("Error: %v\n", err)))
+			return
+		}
 
 		salt, err := base64.RawStdEncoding.DecodeString(hashedSalt)
 		if err != nil {
@@ -72,15 +77,18 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 		}
 
 		err = bcrypt.CompareHashAndPassword([]byte(passwordHash), append([]byte(loginRequest.Password), salt...))
-
 		if err != nil {
-			w.WriteHeader(400)
+			if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+				w.WriteHeader(400)
+				w.Write([]byte("Invalid username or password"))
+				return
+			}
+			w.WriteHeader(500)
 			w.Write([]byte(fmt.Sprintf("Error: %v\n", err)))
 			return
 		}
 
 		tokenString, err := authentication.GenerateToken(loginRequest.Username)
-
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 			w.WriteHeader(500)
