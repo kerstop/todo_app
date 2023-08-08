@@ -15,7 +15,7 @@ func main() {
 	defer database.DbConnPool.Close()
 
 	http.HandleFunc("/todo", handlerWraper(routes.Todo))
-	http.HandleFunc("/login", handlerWraper(routes.Login))
+	http.HandleFunc("/auth", handlerWraper(routes.Auth))
 
 	err := http.ListenAndServe("127.0.0.1:80", nil)
 
@@ -27,11 +27,9 @@ func handlerWraper(handler func(http.ResponseWriter, *http.Request)) func(http.R
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "todo-list-auth")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT")
 
 		handler(w, r)
-
 
 	}
 }

@@ -25,15 +25,14 @@ type createUserRequestForm struct {
 	Password string `json:"password"`
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
-
+func Auth(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 
 	case "GET":
 		user, err := authentication.AuthenticateRequest(r)
 		if err != nil {
-		w.Write([]byte(fmt.Sprintf("%v\n", err)))
+			w.Write([]byte(fmt.Sprintf("%v\n", err)))
 		}
 
 		w.Write([]byte(fmt.Sprintf("attempting to login as %s\n", user)))
@@ -89,7 +88,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		}
 
 		cookie := &http.Cookie{
-			Name: "user_session",
+			Name:  "user_session",
 			Value: tokenString,
 		}
 
@@ -118,10 +117,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("Error: %v\n", err)
 			return
 		}
-		
+
 		fmt.Printf("%s\n", hash)
 
-		_ , err = database.DbConnPool.Exec(r.Context(), `
+		_, err = database.DbConnPool.Exec(r.Context(), `
 		INSERT INTO users (username, passwd_hash, salt)
 		VALUES ($1, $2, $3);
 		`, createUserRequest.Username, string(hash[:]), base64.RawStdEncoding.EncodeToString(salt[:]))
