@@ -93,8 +93,14 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 		}
 
 		http.SetCookie(w, cookie)
+	}
+}
 
-	case "PUT":
+func NewUser(w http.ResponseWriter, r *http.Request) {
+
+	switch r.Method {
+
+	case "POST":
 
 		var createUserRequest createUserRequestForm
 		err := json.NewDecoder(r.Body).Decode(&createUserRequest)
@@ -131,5 +137,4 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
 }

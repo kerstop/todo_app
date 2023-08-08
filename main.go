@@ -14,8 +14,9 @@ func main() {
 	database.Connect(context.Background())
 	defer database.DbConnPool.Close()
 
-	http.HandleFunc("/todo", handlerWraper(routes.Todo))
-	http.HandleFunc("/auth", handlerWraper(routes.Auth))
+	http.HandleFunc("/api/todo", handlerWraper(routes.Todo))
+	http.HandleFunc("/api/auth", handlerWraper(routes.Auth))
+	http.HandleFunc("/api/auth/newUser", handlerWraper(routes.NewUser))
 
 	err := http.ListenAndServe("127.0.0.1:80", nil)
 
@@ -25,9 +26,6 @@ func main() {
 func handlerWraper(handler func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
 
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT")
 
 		handler(w, r)
 

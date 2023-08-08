@@ -1,14 +1,14 @@
 import * as React from "react";
 import "./App.css";
 import { TodoList, TodoListEntry } from "./TodoList";
-import config from "./config";
+import { LoginBar } from "./LoginBar";
 
 function App() {
   const [list, setList] = React.useState<TodoListEntry[]>([]);
   const description_field = React.useRef<null| HTMLInputElement>(null)
 
   React.useEffect(() => {
-    fetch(`${config.server}/todo`)
+    fetch(`/api/todo`)
       .then((val) => {
         console.log(val.body);
         return val.json();
@@ -25,7 +25,7 @@ function App() {
       const description = description_field.current.value
       if (description === null) return;
       console.log(description)
-      fetch(`${config.server}/todo`, {
+      fetch("/api/todo", {
         body: JSON.stringify({
           description: description,
         }),
@@ -46,6 +46,7 @@ function App() {
 
   return (
     <>
+      <LoginBar></LoginBar>
       <TodoList listEntries={list}></TodoList>
       <form onSubmit={createTodo}>
         <input ref={description_field} type="text" name="description" placeholder="Todo" required></input>
