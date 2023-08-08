@@ -1,0 +1,21 @@
+
+.todo-list-entry {
+    display: flex;
+    flex-direction: row;
+
+    outline: rgba(255, 255, 255, 0.87) solid 1px;
+    border-radius: 10px;
+    margin: 5px;
+    width: 30vw;
+    p {
+        text-align: left;
+        margin: 10px;
+        margin-left: 20px;
+        margin-top: 10px;
+        width: fit-content;
+        flex-grow:1;
+    }
+    input {
+        margin-right: 20px
+    }
+}
