@@ -1,7 +1,11 @@
 import * as React from "react";
 import Cookies from "js-cookie";
 
-export function LoginBar() {
+interface LoginBarProps {
+  username: string | null
+}
+
+export function LoginBar(props: LoginBarProps) {
   const [errors, setErrors] = React.useState<string | null>(null);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
@@ -25,16 +29,14 @@ export function LoginBar() {
     });
   };
 
-  const token = Cookies.get("user_session");
 
-  if (token !== undefined) {
-    const token_string = JSON.parse(atob(token.split(".")[1]));
+  if (props.username !== null) {
     return (
       <>
-        <p>The currently logged in user is {token_string.username}</p>
+        <p>The currently logged in user is {props.username}</p>
         <button
           onClick={() => {
-            Cookies.remove("user_session");
+            Cookies.remove("user_session", {path: "/api"});
             location.reload();
           }}
         >

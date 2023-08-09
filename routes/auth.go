@@ -32,7 +32,7 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 
 	case "GET":
-		user, err := authentication.AuthenticateRequest(r)
+		user, _, err := authentication.AuthenticateRequest(r)
 		if err != nil {
 			w.Write([]byte(fmt.Sprintf("%v\n", err)))
 		}

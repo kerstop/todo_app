@@ -5,6 +5,7 @@ import { LoginBar } from "./LoginBar";
 
 function App() {
   const [list, setList] = React.useState<TodoListEntry[]>([]);
+  const [user, setUser] = React.useState<string| null>(null);
   const description_field = React.useRef<null| HTMLInputElement>(null)
 
   React.useEffect(() => {
@@ -14,7 +15,8 @@ function App() {
         return val.json();
       })
       .then((val) => {
-        setList(val);
+        setList(val.todoEntries);
+        setUser(val.username)
       });
   }, []);
 
@@ -38,7 +40,7 @@ function App() {
         setList([...list, {
           id: resp,
           description: description,
-          done: false
+          complete: false
         }])
       })
     }
@@ -46,7 +48,7 @@ function App() {
 
   return (
     <>
-      <LoginBar></LoginBar>
+      <LoginBar username={user}></LoginBar>
       <TodoList listEntries={list}></TodoList>
       <form onSubmit={createTodo}>
         <input ref={description_field} type="text" name="description" placeholder="Todo" required></input>

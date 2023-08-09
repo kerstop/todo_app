@@ -3,7 +3,7 @@ import "./TodoList.scss";
 export interface TodoListEntry {
   id: number;
   description: string;
-  done: boolean;
+  complete: boolean;
 }
 
 interface TodoListProps {
@@ -11,7 +11,15 @@ interface TodoListProps {
 }
 
 export function TodoList(props: TodoListProps) {
-    console.log(props)
+
+  const toggleDone = (id: number) => {
+    fetch("/api/todo/toggleDone", {
+      method: "POST",
+      body: JSON.stringify(id)
+    })
+    
+  }
+
   return (
     <>
       {props.listEntries.map((entry) => {
@@ -19,7 +27,7 @@ export function TodoList(props: TodoListProps) {
         return (
           <div key={entry.id} className="todo-list-entry">
             <p>{entry.description}</p>
-            <input type="checkbox"></input>
+            <input type="checkbox" checked={entry.complete} onClick={()=>{toggleDone(entry.id)}}></input>
           </div>
         );
       })}

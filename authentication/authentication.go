@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"todolist/database"
 
 	"github.com/golang-jwt/jwt"
 )
@@ -31,24 +32,26 @@ func init() {
 	}
 }
 
-func AuthenticateRequest(r *http.Request) (string, error) {
+func AuthenticateRequest(r *http.Request) (string, int, error) {
 	cookie, err := r.Cookie("user_session")
 	if err != nil {
-		return "", ErrNoToken
+		return "", 0, ErrNoToken
 	}
 
 	token, err := jwt.ParseWithClaims(cookie.Value, &CustomClaims{},  func(_ *jwt.Token) (interface{}, error) {return secret[:], nil})
 	if err != nil {
-		return "", errors.Join(ErrInvalid, err)
+		return "", 0, errors.Join(ErrInvalid, err)
 	}
 
 	if !token.Valid {
-		return "", ErrInvalid
+		return "", 0, ErrInvalid
 	}
-
 	username := token.Claims.(*CustomClaims).Username
+	var id int
 
-	return username, nil
+	database.DbConnPool.QueryRow(r.Context(), "SELECT id FROM users WHERE username=$1", username).Scan(&id)
+
+	return username, id, nil
 
 }
 
