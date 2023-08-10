@@ -1,0 +1,31 @@
+volumes:
+  data:
+    name: "production-database"
+
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=postgrespw
+    ports:
+      - 5432:5432
+    volumes:
+      - data:/var/lib/postgresql
+  admin-console:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=pgadmin4@pgadmin.org
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - 5050:80
+    depends_on:
+      - postgres
+  myapp:
+    image: todo-app:0.0.1
+    ports:
+      - 80:80
+    environment:
+      - POSTGRES_PORT=5432
+    depends_on:
+      - postgres
+

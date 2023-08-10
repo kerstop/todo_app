@@ -1,6 +1,7 @@
 package database
 
 import (
+
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"context"
@@ -14,21 +15,14 @@ func Connect(c context.Context) {
 
 	var err error
 
-	DbConnPool, err = pgxpool.New(c, "postgres://postgres:postgrespw@localhost:32769/todo")
-	if err != nil {
-		fmt.Printf("Encountered an error connecting to the database: %v\n", err)
-		os.Exit(1)
+	port_number := os.Getenv("POSGRES_PORT")
+	if len(port_number) == 0 {
+		port_number = "32769"
 	}
 
-	_, err = DbConnPool.Exec(c,
-		`CREATE TABLE IF NOT EXISTS todo_entries (
-	    id serial,
-    	descript text,
-    	complete boolean,
-    	PRIMARY KEY(id)
-	)`)
+	DbConnPool, err = pgxpool.New(c, fmt.Sprintf("postgres://postgres:postgrespw@localhost:%s/todo", port_number))
 	if err != nil {
-		fmt.Printf("Encountered an error creating database: %v\n", err)
+		fmt.Printf("Encountered an error connecting to the database: %v\n", err)
 		os.Exit(1)
 	}
 

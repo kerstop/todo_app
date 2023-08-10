@@ -49,7 +49,7 @@ function App() {
   return (
     <>
       <LoginBar username={user}></LoginBar>
-      <TodoList listEntries={list}></TodoList>
+      <TodoList listEntries={list} setListEntries={setList}></TodoList>
       <form onSubmit={createTodo}>
         <input ref={description_field} type="text" name="description" placeholder="Todo" required></input>
         <input type="button" value="Submit"></input>
