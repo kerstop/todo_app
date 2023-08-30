@@ -21,11 +21,17 @@ services:
     depends_on:
       - postgres
   myapp:
-    image: todo-app:0.0.1
+    image: todo-app:devel
     ports:
       - 80:80
     environment:
       - POSTGRES_PORT=5432
     depends_on:
       - postgres
+    volumes:
+      - .:/hostapp
+    build: 
+      context: .
+      target: development
+    command: bash -c "while true; do sleep 1000; done;"
 

@@ -17,10 +17,10 @@ func Connect(c context.Context) {
 
 	port_number := os.Getenv("POSGRES_PORT")
 	if len(port_number) == 0 {
-		port_number = "32769"
+		port_number = "5432"
 	}
 
-	DbConnPool, err = pgxpool.New(c, fmt.Sprintf("postgres://postgres:postgrespw@localhost:%s/todo", port_number))
+	DbConnPool, err = pgxpool.New(c, fmt.Sprintf("postgres://postgres:postgrespw@host.docker.internal:%s/todo", port_number))
 	if err != nil {
 		fmt.Printf("Encountered an error connecting to the database: %v\n", err)
 		os.Exit(1)
